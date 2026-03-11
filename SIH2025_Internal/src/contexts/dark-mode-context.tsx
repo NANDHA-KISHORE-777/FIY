@@ -1,0 +1,35 @@
+import { createContext, useContext, useState, useEffect, useMemo, ReactNode } from 'react';
+
+interface DarkModeContextType {
+  darkMode: boolean;
+  toggleDarkMode: () => void;
+}
+
+const DarkModeContext = createContext<DarkModeContextType | undefined>(undefined);
+
+export function DarkModeProvider({ children }: { children: ReactNode }) {
+  const [darkMode, setDarkMode] = useState(() => {
+    const saved = localStorage.getItem('darkMode');
+    return saved === 'true';
+  });
+
+  useEffect(() => {
+    localStorage.setItem('darkMode', darkMode.toString());
+  }, [darkMode]);
+
+  const toggleDarkMode = () => {
+    setDarkMode(prev => !prev);
+  };
+
+  const value = useMemo(() => ({ darkMode, toggleDarkMode }), [darkMode]);
+
+  return <DarkModeContext.Provider value={value}>{children}</DarkModeContext.Provider>;
+}
+
+export function useDarkMode() {
+  const context = useContext(DarkModeContext);
+  if (!context) {
+    throw new Error('useDarkMode must be used within DarkModeProvider');
+  }
+  return context;
+}

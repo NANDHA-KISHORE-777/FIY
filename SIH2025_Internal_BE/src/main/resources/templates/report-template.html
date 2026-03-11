@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Groundwater Assessment Report</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 15mm; 
+        }
+
+        body {
+            font-family: "Arial", sans-serif; 
+            margin: 0;
+            padding: 0;
+            background: #f9f9f9;
+            color: #333;
+            line-height: 1.4;
+            font-size: 10pt; 
+        }
+
+        .report-container {
+            background: #fff;
+            padding: 20px 25px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 3px solid #2c3e50;
+        }
+
+        header h1 {
+            font-size: 20pt;
+            margin: 0;
+            text-transform: uppercase;
+            color: #2c3e50;
+        }
+
+        header p {
+            margin: 6px 0 0 0;
+            font-size: 10pt;
+            font-style: italic;
+            color: #555;
+        }
+
+        .section {
+            margin-top: 25px;
+        }
+
+        .section h2 {
+            font-size: 12pt;
+            margin-bottom: 8px;
+            padding-bottom: 3px;
+            border-bottom: 2px solid #3498db;
+            color: #2c3e50;
+        }
+
+        .section p {
+            font-size: 9pt;
+            text-align: justify;
+        }
+
+        .summary-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            table-layout: fixed; 
+            font-size: 7pt; 
+        }
+
+        .summary-table th,
+        .summary-table td {
+            border: 1px solid #ccc;
+            padding: 3px 2px; 
+            text-align: center; 
+            vertical-align: middle;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            white-space: normal;
+            width: 12.5%; 
+        }
+
+        .summary-table th {
+            background-color: #f1f6fb;
+            color: #2c3e50;
+            font-weight: bold;
+            font-size: 6pt; 
+            line-height: 1.1;
+            height: 35px; 
+        }
+
+        .summary-table td {
+            background-color: #fafafa;
+            font-size: 7pt;
+            height: 25px; 
+        }
+
+        .images-grid {
+            width: 100%;
+            margin-top: 15px;
+            text-align: center;
+        }
+
+        .images-grid img {
+            width: 100%;
+            max-width: 100%;
+            height: auto;
+            border: 1px solid #ccc;
+            padding: 10px;
+            border-radius: 4px;
+            background: #fff;
+            margin: 15px 0; 
+            display: block;
+            page-break-inside: avoid;
+        }
+
+        footer {
+            margin-top: 40px;
+            text-align: center;
+            font-size: 8pt;
+            border-top: 1px solid #bbb;
+            padding-top: 8px;
+            color: #777;
+        }
+
+        .highlight {
+            background: #eaf6ff;
+            border-left: 5px solid #3498db;
+            padding: 10px 12px;
+            margin-top: 12px;
+            font-style: italic;
+            font-size: 9pt;
+        }
+        .table-container {
+            width: 100%;
+            margin-top: 10px;
+            overflow: visible;
+        }
+        @media print {
+            .summary-table {
+                font-size: 6pt;
+            }
+            .summary-table th {
+                font-size: 5pt;
+            }
+            .summary-table td {
+                font-size: 6pt;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="report-container">
+        <header>
+            <h1 th:text="${title}">Groundwater Assessment Report</h1>
+            <p th:text="${description}">Annual groundwater analysis and categorization report</p>
+        </header>
+
+        <div class="section">
+            <h2>Executive Summary</h2>
+            <p>
+                This report presents an overview of groundwater assessment across various districts. 
+                It includes categorization of units based on extraction stages (Safe, Semi-Critical, 
+                Critical, Over-Exploited, Saline) and highlights areas requiring urgent intervention.
+            </p>
+            <div class="highlight">
+                Key Insight: Districts with <b>Critical</b> and <b>Over-Exploited</b> categorization 
+                require immediate policy action to ensure sustainable groundwater use.
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Assessment Overview</h2>
+            <div class="table-container">
+                <table class="summary-table">
+                    <thead>
+                        <tr>
+                            <th th:each="header : ${headers}" th:text="${header}">Header</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                         <tr th:each="row : ${rows}">
+                            <td th:each="cell : ${row}" th:text="${cell}">Value</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Graphical Analysis</h2>
+            <div class="images-grid">
+                <img th:each="chart : ${charts}" th:src="${chart}" alt="Analysis Chart"/>
+            </div>
+        </div>
+
+        <footer>
+            <p>Report Generated by INGRES Groundwater Assessment System</p>
+        </footer>
+    </div>
+</body>
+</html>
