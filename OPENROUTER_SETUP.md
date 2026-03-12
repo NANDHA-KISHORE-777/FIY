@@ -29,7 +29,7 @@ DEEPSEEK_MODEL = 'deepseek/deepseek-chat'
 **API Request Format:**
 ```python
 headers = {
-    'Authorization': f'Bearer {OPENROUTER_API_KEY}',
+    'Authorization': f'Bearer {GEMINI_API_KEY}',
     'Content-Type': 'application/json',
     'HTTP-Referer': 'http://localhost:5173',
     'X-Title': 'YURUS IPC Mapper',

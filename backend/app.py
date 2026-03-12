@@ -1,3 +1,8 @@
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
+
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import json
@@ -12,7 +17,7 @@ CORS(app)  # Enable CORS for frontend communication
 # Configuration
 EMBEDDING_FILE = "dataset_with_embeddings.json"
 MODEL_NAME = "all-MiniLM-L6-v2"
-OPENROUTER_API_KEY = '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'
+OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
 OPENROUTER_API_URL = 'https://openrouter.ai/api/v1/chat/completions'
 DEEPSEEK_MODEL = 'deepseek/deepseek-chat'  # DeepSeek v3 model
 
