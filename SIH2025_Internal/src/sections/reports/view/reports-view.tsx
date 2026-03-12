@@ -127,8 +127,8 @@ export function ReportsView() {
       format: 'PDF',
     },
     {
-      title: 'IPC Section Analysis',
-      description: 'Most used IPC sections and trends',
+      title: 'BNS Section Analysis',
+      description: 'Most used BNS sections and trends',
       icon: <AssessmentIcon sx={{ fontSize: 40, color: '#10b981' }} />,
       action: 'Download Excel',
       format: 'Excel',

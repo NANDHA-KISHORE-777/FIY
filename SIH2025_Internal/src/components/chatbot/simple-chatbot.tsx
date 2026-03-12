@@ -18,6 +18,9 @@ import axios from 'axios';
 
 // ----------------------------------------------------------------------
 
+
+
+
 type Message = {
   id: string;
   text: string;
@@ -41,13 +44,32 @@ const BACKEND_URL = 'http://localhost:5000';
 const OPENROUTER_API_KEY = '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';
 
 export function SimpleChatbot({ open, onClose }: ChatbotProps) {
-  const messagesEndRef = useRef<HTMLDivElement | null>(null);
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [inputText, setInputText] = useState('');
-  const [isProcessing, setIsProcessing] = useState(false);
-  const [mode, setMode] = useState<ChatMode>('ipc');
-  const [isListening, setIsListening] = useState(false);
-  const [recognition, setRecognition] = useState<any>(null);
+// --- Mode and separate message histories ---
+const [mode, setMode] = useState<ChatMode>('ipc');
+const [ipcMessages, setIpcMessages] = useState<Message[]>([]);
+const [generalMessages, setGeneralMessages] = useState<Message[]>([]);
+
+// Compute messages to render based on current mode
+const messages = mode === 'ipc' ? ipcMessages : generalMessages;
+
+// --- FIR and input states ---
+const [waitingForFIRDetails, setWaitingForFIRDetails] = useState(false);
+const [complaintTextFIR, setComplaintTextFIR] = useState("");
+const [bnsSection, setBnsSection] = useState("");
+// const [firDrafts, setFIRDrafts] = useState<{ [complaint: string]: string }>({});
+// Store FIR drafts keyed by complaint text
+const [firDrafts, setFIRDrafts] = useState<{ [complaint: string]: string }>({});
+const [firDraftText, setFIRDraftText] = useState("");
+const [inputText, setInputText] = useState('');
+const [isProcessing, setIsProcessing] = useState(false);
+
+// --- Speech recognition ---
+const [isListening, setIsListening] = useState(false);
+const [recognition, setRecognition] = useState<any>(null);
+
+// --- Ref for scrolling ---
+const messagesEndRef = useRef<HTMLDivElement | null>(null);
+  
 
   // Initialize speech recognition
   useEffect(() => {
@@ -83,34 +105,51 @@ export function SimpleChatbot({ open, onClose }: ChatbotProps) {
   useEffect(scrollToBottom, [messages]);
 
   // Add welcome message when chatbot opens
-  useEffect(() => {
-    if (open && messages.length === 0) {
-      const welcomeMessage: Message = {
-        id: 'welcome',
-        text: 'Welcome to YURUS! I can help you find relevant IPC sections for your complaints or answer general questions. Choose a mode to get started.',
-        sender: 'bot',
-        timestamp: new Date(),
-      };
-      setMessages([welcomeMessage]);
-    }
-  }, [open]);
+useEffect(() => {
+  if (!open) return;
 
-  const handleModeChange = (event: React.MouseEvent<HTMLElement>, newMode: ChatMode | null) => {
-    if (newMode !== null && newMode !== mode) {
-      setMode(newMode);
-      // Clear messages and start fresh conversation for the new mode
-      const modeMessage: Message = {
-        id: `mode-${Date.now()}`,
-        text: newMode === 'ipc' 
-          ? 'IPC Finder mode activated. Describe your complaint and I\'ll find the relevant IPC section.'
-          : 'General chat mode activated. Ask me anything about legal matters!',
-        sender: 'bot',
-        timestamp: new Date(),
-      };
-      setMessages([modeMessage]);
-    }
+  // Only add a welcome message if the current mode has no messages
+  if (mode === 'ipc' && ipcMessages.length === 0) {
+    const welcomeMessage: Message = {
+      id: 'welcome',
+      text: 'Welcome to YURUS! I can help you find relevant BNS sections for your complaints or answer general questions. Describe your complaint to get started.',
+      sender: 'bot',
+      timestamp: new Date(),
+    };
+    setIpcMessages([welcomeMessage]);
+  } else if (mode === 'general' && generalMessages.length === 0) {
+    const welcomeMessage: Message = {
+      id: 'welcome',
+      text: 'Welcome to YURUS General Chat! Ask me anything about legal matters.',
+      sender: 'bot',
+      timestamp: new Date(),
+    };
+    setGeneralMessages([welcomeMessage]);
+  }
+}, [open, mode]);
+
+const handleModeChange = (event: React.MouseEvent<HTMLElement>, newMode: ChatMode | null) => {
+  if (!newMode || newMode === mode) return;
+
+  setMode(newMode);
+
+  const modeMessage: Message = {
+    id: `mode-${Date.now()}`,
+    text:
+      newMode === 'ipc'
+        ? "BNS Finder mode activated. Describe your complaint and I'll find the relevant BNS section."
+        : "General chat mode activated. Ask me anything about legal matters!",
+    sender: 'bot',
+    timestamp: new Date(),
   };
 
+  if (newMode === 'ipc') {
+    // Only add if this mode has no messages yet
+    setIpcMessages(prev => (prev.length === 0 ? [modeMessage] : prev));
+  } else {
+    setGeneralMessages(prev => (prev.length === 0 ? [modeMessage] : prev));
+  }
+};
   const handleVoiceInput = () => {
     if (!recognition) {
       alert('Speech recognition is not supported in your browser.');
@@ -191,47 +230,232 @@ export function SimpleChatbot({ open, onClose }: ChatbotProps) {
       return 'Error connecting to chat service. Please make sure the backend is running and OpenRouter API is configured.';
     }
   };
+// -------------------------------
+// FIR Draft Generator
+// -------------------------------
+const generateFIRDraft = (details: string, complaint: string, section: string) => {
+  // Split the user input by commas and trim spaces
+  const parts = details.split(',').map(p => p.trim());
 
-  const handleSend = async () => {
-    const messageText = inputText.trim();
-    if (!messageText || isProcessing) return;
+  // Map to the proper fields safely
+  const [name, address, dateOfIncident, timeOfIncident, location, policeStation] = parts;
 
-    setIsProcessing(true);
-    setInputText('');
+  return `FIR DRAFT
 
-    // Add user message
-    const userMessage: Message = {
-      id: `user-${Date.now()}`,
-      text: messageText,
-      sender: 'user',
+To  
+The Station House Officer
+${policeStation || ''}
+
+Date: ${dateOfIncident || ''}
+
+Subject: Complaint regarding offence under ${section}
+
+Respected Sir/Madam,
+
+I hereby lodge a complaint regarding the following incident:
+
+Incident Description:
+${complaint}
+
+Relevant Legal Section:
+${section}
+
+Complainant Details:
+- Name: ${name || ''}
+- Address: ${address || ''}
+- Date of Incident: ${dateOfIncident || ''}
+- Time of Incident: ${timeOfIncident || ''}
+- Location of Incident: ${location || ''}
+- Nearest Police Station: ${policeStation || ''}
+
+I kindly request you to register this complaint and take necessary legal action.
+
+Thanking you.
+
+Yours faithfully,
+${name || ''}
+`;
+};
+const handleSend = async () => {
+  const messageText = inputText.trim();
+  if (!messageText || isProcessing) return;
+
+  setIsProcessing(true);
+  setInputText(''); // clear input immediately
+
+  // 1️⃣ Add user message
+  const userMessage: Message = {
+    id: `user-${Date.now()}`,
+    text: messageText,
+    sender: 'user',
+    timestamp: new Date(),
+  };
+  if (mode === 'ipc') setIpcMessages(prev => [...prev, userMessage]);
+  else setGeneralMessages(prev => [...prev, userMessage]);
+
+  // 2️⃣ FIR Draft Handling
+  // Check if FIR draft already exists for this complaint
+  if (firDrafts[messageText]) {
+    const botMsg: Message = {
+      id: `bot-${Date.now()}`,
+      text: firDrafts[messageText], // use existing draft
+      sender: 'bot',
       timestamp: new Date(),
     };
-    setMessages(prev => [...prev, userMessage]);
+    if (mode === 'ipc') setIpcMessages(prev => [...prev, botMsg]);
+    else setGeneralMessages(prev => [...prev, botMsg]);
 
-    // Generate bot response based on mode
-    let botMessage: Message;
-    if (mode === 'ipc') {
-      const ipcResponse = await handleIPCFinder(messageText);
-      botMessage = {
-        id: `bot-${Date.now()}`,
-        text: ipcResponse.text,
-        sender: 'bot',
-        timestamp: new Date(),
-        ipcData: ipcResponse.ipcData,
-      };
-    } else {
-      const generalResponse = await handleGeneralChat(messageText);
-      botMessage = {
-        id: `bot-${Date.now()}`,
-        text: generalResponse,
-        sender: 'bot',
-        timestamp: new Date(),
-      };
-    }
-
-    setMessages(prev => [...prev, botMessage]);
     setIsProcessing(false);
-  };
+    return; // exit early, no need to ask for details again
+  }
+
+  if (waitingForFIRDetails) {
+    // User has provided the comma-separated details for a new FIR
+    const parts = messageText.split(',').map(p => p.trim());
+    const [name, address, dateOfIncident, timeOfIncident, location, policeStation] = parts;
+
+    const firMessageText = `
+FIR DRAFT
+
+To
+The Station House Officer
+${policeStation || ''}
+
+Date: ${dateOfIncident || ''}
+
+Subject: Complaint regarding offence under ${bnsSection}
+
+Respected Sir/Madam,
+
+I hereby lodge a complaint regarding the following incident:
+
+Incident Description:
+${complaintTextFIR}
+
+Relevant Legal Section:
+${bnsSection}
+
+Complainant Details:
+- Name: ${name || ''}
+- Address: ${address || ''}
+- Date of Incident: ${dateOfIncident || ''}
+- Time of Incident: ${timeOfIncident || ''}
+- Location of Incident: ${location || ''}
+
+I kindly request you to register this complaint and take necessary legal action.
+
+Thanking you.
+
+Yours faithfully,
+${name || ''}
+`;
+
+    // Save FIR draft keyed by the original complaint
+    setFIRDrafts(prev => ({ ...prev, [complaintTextFIR]: firMessageText }));
+
+    const botMsg: Message = {
+      id: `bot-${Date.now()}`,
+      text: firMessageText,
+      sender: 'bot',
+      timestamp: new Date(),
+    };
+    if (mode === 'ipc') setIpcMessages(prev => [...prev, botMsg]);
+    else setGeneralMessages(prev => [...prev, botMsg]);
+
+    setWaitingForFIRDetails(false);
+    setIsProcessing(false);
+    return;
+  }
+
+  // 3️⃣ Bot response based on mode
+  let botMsg: Message;
+  if (mode === 'ipc') {
+    const ipcResponse = await handleIPCFinder(messageText);
+    const section = ipcResponse.ipcData?.ipc_section || 'Unknown Section';
+
+    setComplaintTextFIR(messageText); // store complaint for FIR
+    setBnsSection(section);
+
+    botMsg = {
+      id: `bot-${Date.now()}`,
+      text: ipcResponse.text + `
+
+To generate an FIR draft please provide the following details (comma-separated):
+
+Full Name:
+Address:
+Date of Incident:
+Time of Incident:
+Location:
+`,
+      sender: 'bot',
+      timestamp: new Date(),
+      ipcData: ipcResponse.ipcData,
+    };
+
+    setWaitingForFIRDetails(true);
+  } else {
+    const generalReply = await handleGeneralChat(messageText);
+    botMsg = {
+      id: `bot-${Date.now()}`,
+      text: generalReply,
+      sender: 'bot',
+      timestamp: new Date(),
+    };
+  }
+
+  // 4️⃣ Save bot message
+  if (mode === 'ipc') setIpcMessages(prev => [...prev, botMsg]);
+  else setGeneralMessages(prev => [...prev, botMsg]);
+
+  setIsProcessing(false);
+};
+//   const handleSend = async () => {
+//     const messageText = inputText.trim();
+//     if (!messageText || isProcessing) return;
+
+// if (waitingForFIRDetails) {
+//   // This block will run **only if the bot is waiting for FIR details**
+// }
+
+
+
+//     setIsProcessing(true);
+//     setInputText('');
+
+//     // Add user message
+//     const userMessage: Message = {
+//       id: `user-${Date.now()}`,
+//       text: messageText,
+//       sender: 'user',
+//       timestamp: new Date(),
+//     };
+//     setMessages(prev => [...prev, userMessage]);
+
+//     // Generate bot response based on mode
+//     let botMessage: Message;
+//     if (mode === 'ipc') {
+//       const ipcResponse = await handleIPCFinder(messageText);
+//       botMessage = {
+//         id: `bot-${Date.now()}`,
+//         text: ipcResponse.text,
+//         sender: 'bot',
+//         timestamp: new Date(),
+//         ipcData: ipcResponse.ipcData,
+//       };
+//     } else {
+//       const generalResponse = await handleGeneralChat(messageText);
+//       botMessage = {
+//         id: `bot-${Date.now()}`,
+//         text: generalResponse,
+//         sender: 'bot',
+//         timestamp: new Date(),
+//       };
+//     }
+
+//     setMessages(prev => [...prev, botMessage]);
+//     setIsProcessing(false);
+//   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
@@ -313,7 +537,7 @@ export function SimpleChatbot({ open, onClose }: ChatbotProps) {
                     YURUS Assistant
                   </Typography>
                   <Typography variant="caption" sx={{ color: 'rgba(255, 255, 255, 0.8)' }}>
-                    IPC Section Mapper
+                    BNS Section Mapper
                   </Typography>
                 </Box>
                 <IconButton onClick={onClose} sx={{ color: '#ffffff' }}>
@@ -338,7 +562,7 @@ export function SimpleChatbot({ open, onClose }: ChatbotProps) {
                 >
                   <ToggleButton value="ipc" aria-label="IPC Finder">
                     <GavelIcon sx={{ mr: 1, fontSize: 18 }} />
-                    IPC Finder
+                    BNS Finder
                   </ToggleButton>
                   <ToggleButton value="general" aria-label="General Chat">
                     <ChatIcon sx={{ mr: 1, fontSize: 18 }} />
@@ -383,7 +607,7 @@ export function SimpleChatbot({ open, onClose }: ChatbotProps) {
                       {message.ipcData && (
                         <Box sx={{ mt: 1.5, pt: 1.5, borderTop: '1px solid #e0e0e0' }}>
                           <Chip
-                            label={`IPC Section: ${message.ipcData.ipc_section}`}
+                            label={`BNS Section: ${message.ipcData.ipc_section}`}
                             size="small"
                             color="primary"
                             sx={{ mb: 1, fontWeight: 600 }}

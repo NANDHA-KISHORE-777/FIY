@@ -15,11 +15,11 @@ export const complaintTrendsData = {
 };
 
 export const ipcDistributionData = [
-  { label: 'IPC 379 (Theft)', value: 45 },
-  { label: 'IPC 420 (Fraud)', value: 32 },
-  { label: 'IPC 323 (Assault)', value: 28 },
-  { label: 'IPC 406 (Breach of Trust)', value: 22 },
-  { label: 'IPC 504 (Insult)', value: 18 },
+  { label: 'BNS 379 (Theft)', value: 45 },
+  { label: 'BNS 420 (Fraud)', value: 32 },
+  { label: 'BNS 323 (Assault)', value: 28 },
+  { label: 'BNS 406 (Breach of Trust)', value: 22 },
+  { label: 'BNS 504 (Insult)', value: 18 },
   { label: 'Others', value: 35 }
 ];
 
@@ -47,11 +47,11 @@ export const monthlyStatsData = [
 ];
 
 export const topIPCSections = [
-  { section: 'IPC 379', description: 'Theft', count: 45, percentage: 25 },
-  { section: 'IPC 420', description: 'Fraud', count: 32, percentage: 18 },
-  { section: 'IPC 323', description: 'Assault', count: 28, percentage: 16 },
-  { section: 'IPC 406', description: 'Breach of Trust', count: 22, percentage: 12 },
-  { section: 'IPC 504', description: 'Insult', count: 18, percentage: 10 },
+  { section: 'BNS 379', description: 'Theft', count: 45, percentage: 25 },
+  { section: 'BNS 420', description: 'Fraud', count: 32, percentage: 18 },
+  { section: 'BNS 323', description: 'Assault', count: 28, percentage: 16 },
+  { section: 'BNS 406', description: 'Breach of Trust', count: 22, percentage: 12 },
+  { section: 'BNS 504', description: 'Insult', count: 18, percentage: 10 },
 ];
 
 export const dailyActivityData = {

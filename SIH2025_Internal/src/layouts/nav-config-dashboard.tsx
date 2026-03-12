@@ -23,7 +23,7 @@ export const navData = [
     icon: icon('ic-analytics'),
   },
   {
-    title: 'IPC Library',
+    title: 'BNS Library',
     path: '/ipc-library',
     icon: icon('ic-blog'),
   },

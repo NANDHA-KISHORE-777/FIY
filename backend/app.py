@@ -12,7 +12,7 @@ CORS(app)  # Enable CORS for frontend communication
 # Configuration
 EMBEDDING_FILE = "dataset_with_embeddings.json"
 MODEL_NAME = "all-MiniLM-L6-v2"
-OPENROUTER_API_KEY = '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'
+OPENROUTER_API_KEY = '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'
 OPENROUTER_API_URL = 'https://openrouter.ai/api/v1/chat/completions'
 DEEPSEEK_MODEL = 'deepseek/deepseek-chat'  # DeepSeek v3 model
 
@@ -85,11 +85,13 @@ def ipc_finder():
         if match and similarity > 0.3:  # Threshold for relevance
             response = {
                 'success': True,
-                'ipc_section': match.get('IPC_Sections', 'Not found'),
+                # 'ipc_section': match.get('IPC_Sections', 'Not found'),
+                'ipc_section': match.get('BNS_Sections', 'Not found').replace("IPC", "BNS"),
                 'description': match.get('Incident_Description', ''),
                 'fir_id': match.get('FIR_ID', ''),
                 'similarity_score': float(similarity),
-                'message': f"Based on your complaint, the relevant IPC section is: {match.get('IPC_Sections', 'Not found')}"
+                # 'message': f"Based on your complaint, the relevant IPC section is: {match.get('IPC_Sections', 'Not found')}"
+                'message': f"Based on your complaint, the relevant BNS section is: {match.get('BNS_Sections', 'Not found').replace('IPC','BNS')}"
             }
         else:
             response = {
@@ -141,7 +143,8 @@ def general_chat():
             'messages': [
                 {
                     'role': 'system',
-                    'content': 'You are a helpful legal assistant for the YURUS IPC Mapper application. Provide clear and accurate information about Indian Penal Code sections and legal matters. Avoid using markdown formatting like ** or ##. Use plain text only with proper paragraphs.'
+                    # 'content': 'You are a helpful legal assistant for the YURUS IPC Mapper application. Provide clear and accurate information about Indian Penal Code sections and legal matters. Avoid using markdown formatting like ** or ##. Use plain text only with proper paragraphs.'
+                    'content': 'You are a helpful legal assistant for the YURUS legal chatbot. The Indian Penal Code has been replaced by the Bharatiya Nyaya Sanhita (BNS). Always explain legal matters using BNS sections instead of IPC sections. Provide clear explanations. Avoid markdown formatting and respond in plain text.'
                 },
                 {
                     'role': 'user',

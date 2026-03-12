@@ -18,7 +18,7 @@ export const enhancedComplaintData: EnhancedComplaint[] = [
     status: "Solved",
     complainantName: "Rajesh Kumar",
     location: "Mumbai Central Railway Station",
-    ipcSection: "IPC 379",
+    ipcSection: "BNS 379",
     priority: "High",
     assignedTo: "Officer Sharma",
     remarks: "CCTV footage reviewed, suspect identified and arrested"
@@ -31,7 +31,7 @@ export const enhancedComplaintData: EnhancedComplaint[] = [
     status: "Solved",
     complainantName: "Priya Patel",
     location: "Ahmedabad",
-    ipcSection: "IPC 420",
+    ipcSection: "BNS 420",
     priority: "High",
     assignedTo: "Officer Mehta",
     remarks: "Fraudulent website shut down, amount recovered"
@@ -44,7 +44,7 @@ export const enhancedComplaintData: EnhancedComplaint[] = [
     status: "Pending",
     complainantName: "Amit Singh",
     location: "Connaught Place, Delhi",
-    ipcSection: "IPC 323",
+    ipcSection: "BNS 323",
     priority: "Medium",
     assignedTo: "Officer Verma",
     remarks: "Investigation in progress, witness statements being recorded"
@@ -57,7 +57,7 @@ export const enhancedComplaintData: EnhancedComplaint[] = [
     status: "Pending",
     complainantName: "Sunita Reddy",
     location: "Hyderabad",
-    ipcSection: "IPC 406",
+    ipcSection: "BNS 406",
     priority: "Medium",
     assignedTo: "Officer Rao",
     remarks: "Financial documents under review"
@@ -70,7 +70,7 @@ export const enhancedComplaintData: EnhancedComplaint[] = [
     status: "Solved",
     complainantName: "Vikram Malhotra",
     location: "Bangalore",
-    ipcSection: "IPC 504",
+    ipcSection: "BNS 504",
     priority: "Low",
     assignedTo: "Officer Nair",
     remarks: "Parties reconciled, case closed with mutual agreement"
@@ -83,7 +83,7 @@ export const enhancedComplaintData: EnhancedComplaint[] = [
     status: "Pending",
     complainantName: "Meera Joshi",
     location: "Pune",
-    ipcSection: "IPC 380",
+    ipcSection: "BNS 380",
     priority: "High",
     assignedTo: "Officer Desai",
     remarks: "Forensic team collected evidence, investigation ongoing"
@@ -96,7 +96,7 @@ export const enhancedComplaintData: EnhancedComplaint[] = [
     status: "Solved",
     complainantName: "Anjali Sharma",
     location: "Chennai",
-    ipcSection: "IPC 509",
+    ipcSection: "BNS 509",
     priority: "Medium",
     assignedTo: "Officer Kumar",
     remarks: "Accused identified through IP tracking, legal action taken"
@@ -109,7 +109,7 @@ export const enhancedComplaintData: EnhancedComplaint[] = [
     status: "Pending",
     complainantName: "Ravi Iyer",
     location: "Kochi",
-    ipcSection: "IPC 465",
+    ipcSection: "BNS 465",
     priority: "High",
     assignedTo: "Officer Menon",
     remarks: "Document verification in progress with registrar office"
@@ -122,7 +122,7 @@ export const enhancedComplaintData: EnhancedComplaint[] = [
     status: "Solved",
     complainantName: "Deepak Gupta",
     location: "Jaipur",
-    ipcSection: "IPC 500",
+    ipcSection: "BNS 500",
     priority: "Medium",
     assignedTo: "Officer Rathore",
     remarks: "Newspaper published apology, case settled"
@@ -135,7 +135,7 @@ export const enhancedComplaintData: EnhancedComplaint[] = [
     status: "Pending",
     complainantName: "Kavita Nair",
     location: "Trivandrum",
-    ipcSection: "IPC 384",
+    ipcSection: "BNS 384",
     priority: "High",
     assignedTo: "Officer Pillai",
     remarks: "Phone records being analyzed, suspect under surveillance"

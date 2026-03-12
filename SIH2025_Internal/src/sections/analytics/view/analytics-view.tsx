@@ -185,7 +185,7 @@ export function AnalyticsView() {
           <Card>
             <CardContent>
               <Typography variant="h6" sx={{ mb: 2 }}>
-                Top IPC Sections
+                Top BNS Sections
               </Typography>
               <Box sx={{ height: 350 }}>
                 <Chart
@@ -253,7 +253,7 @@ export function AnalyticsView() {
           <Card>
             <CardContent>
               <Typography variant="h6" sx={{ mb: 2 }}>
-                Top IPC Sections
+                Top BNS Sections
               </Typography>
               <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                 {topIPCSections.map((item, index) => (
